@@ -23,3 +23,4 @@ EXPOSE 80
 # Render automáticamente inyecta la variable $PORT, pero Apache usa 80 internamente
 # Render maneja el mapeo del puerto externo al 80 interno
 CMD ["apache2-foreground"]
+

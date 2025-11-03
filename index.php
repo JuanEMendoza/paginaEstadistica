@@ -1,44 +1,38 @@
 <?php
-// Cargar variables de entorno si existe archivo .env
-if (file_exists(__DIR__ . '/.env')) {
-    $lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
-        list($name, $value) = explode('=', $line, 2);
-        $_ENV[trim($name)] = trim($value);
-    }
-}
+// Datos de conexión a Railway (actualizados)
+$servername = "shuttle.proxy.rlwy.net";
+$username = "root";
+$password = "HYxtXzGVoWFQYPDuePQdYAslPjOyVhwS";
+$database = "railway";
+$port = 55685;
 
-// Datos de conexión desde variables de entorno (con valores por defecto)
-$servername = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?? "gondola.proxy.rlwy.net";
-$username = $_ENV['DB_USER'] ?? getenv('DB_USER') ?? "root";
-$password = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?? "OQaQPDjxUTUnqkGKxEsnsvqlgWofOUyK";
-$database = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? "railway";
-$port = isset($_ENV['DB_PORT']) ? (int)$_ENV['DB_PORT'] : (int)(getenv('DB_PORT') ?: 45154);
-
-// Conexión con configuración mejorada para Railway
-// Railway requiere SSL para conexiones externas
+// Configuración de timeouts
 ini_set('mysqli.default_socket', '');
-ini_set('default_socket_timeout', 10);
+ini_set('default_socket_timeout', 30);
+ini_set('mysqli.connect_timeout', 30);
 
-// Intentar conexión con opciones SSL
-$conn = mysqli_init();
+// Intentar conexión simple primero
+$conn = @new mysqli($servername, $username, $password, $database, $port);
 
-// Configurar opciones SSL (Railway requiere SSL para conexiones externas)
-mysqli_options($conn, MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
-mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
-
-// Configurar timeout
-mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 10);
-mysqli_options($conn, MYSQLI_OPT_READ_TIMEOUT, 10);
-
-// Realizar la conexión
-if (!mysqli_real_connect($conn, $servername, $username, $password, $database, $port, NULL, MYSQLI_CLIENT_SSL)) {
-    // Si falla con SSL, intentar sin SSL (para conexiones locales)
-    $conn = new mysqli($servername, $username, $password, $database, $port);
-    if ($conn->connect_error) {
-        die("Error de conexión a la base de datos: " . $conn->connect_error . 
-            "<br>Verifica que las variables de entorno estén correctamente configuradas y que la BD permita conexiones externas.");
+if ($conn->connect_error) {
+    // Si falla la conexión simple, intentar con SSL (Railway requiere SSL para conexiones externas)
+    $conn = mysqli_init();
+    
+    // Configurar opciones SSL
+    mysqli_options($conn, MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
+    mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
+    
+    // Configurar timeouts
+    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 30);
+    mysqli_options($conn, MYSQLI_OPT_READ_TIMEOUT, 30);
+    
+    // Intentar conexión con SSL
+    if (!mysqli_real_connect($conn, $servername, $username, $password, $database, $port, NULL, MYSQLI_CLIENT_SSL)) {
+        die("Error de conexión a la base de datos: " . mysqli_connect_error() . 
+            "<br><br>Verifica que:<br>" .
+            "1. Las credenciales sean correctas<br>" .
+            "2. Railway permita conexiones externas<br>" .
+            "3. Tu conexión a Internet esté activa");
     }
 }
 
