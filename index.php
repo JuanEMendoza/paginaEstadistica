@@ -16,11 +16,34 @@ $password = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?? "OQaQPDjxUTUnqkGKxE
 $database = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? "railway";
 $port = isset($_ENV['DB_PORT']) ? (int)$_ENV['DB_PORT'] : (int)(getenv('DB_PORT') ?: 45154);
 
-// Conexión
-$conn = new mysqli($servername, $username, $password, $database, $port);
-if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+// Conexión con configuración mejorada para Railway
+// Railway requiere SSL para conexiones externas
+ini_set('mysqli.default_socket', '');
+ini_set('default_socket_timeout', 10);
+
+// Intentar conexión con opciones SSL
+$conn = mysqli_init();
+
+// Configurar opciones SSL (Railway requiere SSL para conexiones externas)
+mysqli_options($conn, MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
+mysqli_ssl_set($conn, NULL, NULL, NULL, NULL, NULL);
+
+// Configurar timeout
+mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, 10);
+mysqli_options($conn, MYSQLI_OPT_READ_TIMEOUT, 10);
+
+// Realizar la conexión
+if (!mysqli_real_connect($conn, $servername, $username, $password, $database, $port, NULL, MYSQLI_CLIENT_SSL)) {
+    // Si falla con SSL, intentar sin SSL (para conexiones locales)
+    $conn = new mysqli($servername, $username, $password, $database, $port);
+    if ($conn->connect_error) {
+        die("Error de conexión a la base de datos: " . $conn->connect_error . 
+            "<br>Verifica que las variables de entorno estén correctamente configuradas y que la BD permita conexiones externas.");
+    }
 }
+
+// Configurar charset UTF-8
+$conn->set_charset("utf8mb4");
 
 // Crear tabla actualizada si no existe
 $conn->query("
