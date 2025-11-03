@@ -1,0 +1,19 @@
+# Archivos de entorno con credenciales
+.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+*.log
+
+# Archivos del editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos temporales
+*.tmp
+*.bak
+

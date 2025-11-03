@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: estadistica-app
+    env: php
+    buildCommand: echo "No build needed"
+    startCommand: php -S 0.0.0.0:$PORT
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_PORT
+        sync: false
+

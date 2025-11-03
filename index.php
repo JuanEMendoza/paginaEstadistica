@@ -1,10 +1,20 @@
 <?php
-// Datos de conexión a Railway
-$servername = "gondola.proxy.rlwy.net";
-$username = "root";
-$password = "OQaQPDjxUTUnqkGKxEsnsvqlgWofOUyK";
-$database = "railway";
-$port = 45154;
+// Cargar variables de entorno si existe archivo .env
+if (file_exists(__DIR__ . '/.env')) {
+    $lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        list($name, $value) = explode('=', $line, 2);
+        $_ENV[trim($name)] = trim($value);
+    }
+}
+
+// Datos de conexión desde variables de entorno (con valores por defecto)
+$servername = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?? "gondola.proxy.rlwy.net";
+$username = $_ENV['DB_USER'] ?? getenv('DB_USER') ?? "root";
+$password = $_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?? "OQaQPDjxUTUnqkGKxEsnsvqlgWofOUyK";
+$database = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?? "railway";
+$port = isset($_ENV['DB_PORT']) ? (int)$_ENV['DB_PORT'] : (int)(getenv('DB_PORT') ?: 45154);
 
 // Conexión
 $conn = new mysqli($servername, $username, $password, $database, $port);
