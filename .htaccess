@@ -1,0 +1,23 @@
+# Configuración Apache para la aplicación
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Redirigir todo a index.php si el archivo no existe
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+
+# Configuraciones de seguridad
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Prevenir acceso a archivos sensibles
+<FilesMatch "\.(env|git|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+

@@ -1,9 +1,9 @@
 services:
   - type: web
     name: estadistica-app
-    env: php
-    buildCommand: echo "No build needed"
-    startCommand: php -S 0.0.0.0:$PORT
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: DB_HOST
         sync: false

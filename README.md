@@ -43,7 +43,7 @@ Railway es la opción más recomendada ya que tu base de datos ya está alojada 
 
 ## Opción 2: Render (Gratis) 🎨
 
-Render ofrece un plan gratuito ideal para proyectos PHP.
+Render ofrece un plan gratuito ideal para proyectos PHP usando Docker.
 
 ### Pasos:
 
@@ -57,9 +57,8 @@ Render ofrece un plan gratuito ideal para proyectos PHP.
 
 3. **Configuración:**
    - **Name:** estadistica-app (o el que prefieras)
-   - **Environment:** PHP
-   - **Build Command:** `echo "No build needed"`
-   - **Start Command:** `php -S 0.0.0.0:$PORT`
+   - **Environment:** Selecciona **Docker** (no PHP directamente)
+   - **Dockerfile Path:** `./Dockerfile` (o deja el campo vacío si está en la raíz)
    - **Plan:** Free
 
 4. **Variables de entorno:**
@@ -74,8 +73,10 @@ Render ofrece un plan gratuito ideal para proyectos PHP.
 
 5. **Deploy:**
    - Haz clic en "Create Web Service"
-   - Render desplegará automáticamente
+   - Render desplegará automáticamente usando el Dockerfile
    - Obtendrás una URL como: `tu-app.onrender.com`
+
+**Nota:** El proyecto incluye un `Dockerfile` y `render.yaml` listos para usar. Si usas el archivo `render.yaml`, Render detectará automáticamente la configuración.
 
 ---
 

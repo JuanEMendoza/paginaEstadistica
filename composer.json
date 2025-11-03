@@ -1,0 +1,12 @@
+{
+  "name": "estadistica/analisis-pasos",
+  "description": "Aplicación web para análisis estadístico de datos de pasos",
+  "type": "project",
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "files": []
+  }
+}
+
